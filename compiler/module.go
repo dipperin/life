@@ -21,9 +21,9 @@ type Module struct {
 
 type InterpreterCode struct {
 	NumRegs    int
-	NumParams  int
-	NumLocals  int
-	NumReturns int
+	NumParams  int //number of input parameter
+	NumLocals  int //number of function locals
+	NumReturns int //number of return value
 	Bytes      []byte
 	JITInfo    interface{}
 	JITDone    bool
@@ -178,6 +178,7 @@ func (m *Module) CompileForInterpreter(gp GasPolicy) (_retCode []InterpreterCode
 	importTypeIDs := make([]int, 0)
 
 	if m.Base.Import != nil {
+		j := 0
 		for i := 0; i < len(m.Base.Import.Entries); i++ {
 			e := &m.Base.Import.Entries[i]
 			if e.Type.Kind() != wasm.ExternalFunction {
@@ -190,7 +191,7 @@ func (m *Module) CompileForInterpreter(gp GasPolicy) (_retCode []InterpreterCode
 
 			binary.Write(buf, binary.LittleEndian, uint32(1)) // value ID
 			binary.Write(buf, binary.LittleEndian, opcodes.InvokeImport)
-			binary.Write(buf, binary.LittleEndian, uint32(i))
+			binary.Write(buf, binary.LittleEndian, uint32(j))
 
 			binary.Write(buf, binary.LittleEndian, uint32(0))
 			if len(ty.ReturnTypes) != 0 {
@@ -210,6 +211,7 @@ func (m *Module) CompileForInterpreter(gp GasPolicy) (_retCode []InterpreterCode
 				Bytes:      code,
 			})
 			importTypeIDs = append(importTypeIDs, int(tyID))
+			j++
 		}
 	}
 

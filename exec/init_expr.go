@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/binary"
 	"io"
-
 	"github.com/go-interpreter/wagon/wasm/leb128"
 	ops "github.com/go-interpreter/wagon/wasm/operators"
 )
